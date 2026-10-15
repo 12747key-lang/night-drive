@@ -1,0 +1,253 @@
+\xef\xbb\xbf<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
+<title>PIXEL NIGHT DRIVE — TURBO EDITION</title>
+<style>
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent;-webkit-user-select:none;user-select:none}
+html,body{height:100%}
+body{margin:0;background:#050511;color:#fff;font-family:Arial,Helvetica,sans-serif;overflow:hidden;touch-action:none}
+#game{position:fixed;inset:0;width:100vw;height:100dvh;display:block;background:#070719;image-rendering:pixelated;object-fit:contain}
+.screen{position:fixed;inset:0;display:flex;flex-direction:column;justify-content:flex-start;align-items:center;-webkit-overflow-scrolling:touch;background:rgba(4,4,20,.93);padding:14px;text-align:center;z-index:10;overflow-y:auto}
+.hidden{display:none!important}
+h1{color:#00f6ff;text-shadow:0 0 12px #00d9ff;font-size:clamp(22px,4.5vw,40px);margin:0 0 6px}
+h2{color:#ffd700;margin:8px 0;font-size:clamp(15px,3vw,21px);text-shadow:0 0 8px #ffaa00}
+.subtitle{color:#b8b8d7;margin:0 0 10px;font-size:13px}
+.stats-bar{display:flex;gap:14px;justify-content:center;align-items:center;margin-bottom:8px;flex-wrap:wrap;background:#0a0a22;border:2px solid #34345c;border-radius:10px;padding:6px 14px;font-size:14px}
+.stat{display:flex;align-items:center;gap:6px}
+.stat .icon{font-size:18px}
+.stat .value{color:#ffd700;font-weight:bold;font-size:16px}
+.stat .value.level{color:#00f6ff}
+#cars{display:grid;grid-template-columns:repeat(auto-fill,minmax(110px,1fr));gap:8px;width:min(900px,100%);margin-bottom:10px}
+.car-card{min-width:0;border:2px solid #34345c;background:#101029;border-radius:10px;padding:6px 4px;cursor:pointer;position:relative;transition:all .15s}
+.car-card.selected{border-color:#00f6ff;box-shadow:0 0 15px #00d9ff66}
+.car-card canvas{display:block;width:100%;height:56px;margin-top:2px}
+.car-name{font-size:clamp(9px,1.7vw,12px);font-weight:bold;margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.car-status{font-size:clamp(9px,1.8vw,12px);font-weight:bold;margin-top:1px}
+.car-status.owned{color:#6bffab}
+.car-status.locked{color:#ffd700}
+#tracks{display:flex;gap:8px;flex-wrap:wrap;justify-content:center;margin-bottom:8px}
+.track-btn{padding:8px 12px;font-size:12px;border-color:#34345c;background:#101029}
+.track-btn.sel{border-color:#ffd700;box-shadow:0 0 12px #ffd70066}
+.track-btn.lock{opacity:.5}
+button{border:2px solid #00eaff;color:#fff;background:#101a38;border-radius:9px;padding:12px 18px;font-size:14px;font-weight:bold;cursor:pointer;touch-action:none;user-select:none}
+button:active{background:#075a70;transform:scale(.97)}
+button:disabled{opacity:.5;cursor:not-allowed}
+#startButton{background:#00bfcf;color:#06101b;border-color:#8affff;font-size:17px;padding:14px 32px}
+#shopButton{background:#ffd700;color:#1a1a00;border-color:#fff8b0;font-size:15px;padding:12px 24px}
+#muteBtn{position:fixed;top:8px;left:50%;transform:translateX(-50%);z-index:40;padding:5px 10px;font-size:15px;border-radius:8px;background:#0a0a22cc}
+#controls{position:fixed;inset:0;z-index:5;pointer-events:none}
+.control{position:absolute;pointer-events:auto;width:clamp(58px,10vw,85px);height:clamp(52px,10vh,75px);padding:0;font-size:clamp(21px,4vw,30px);background:#11182dcc;border-color:#00eaff;box-shadow:0 0 10px #00d9ff33}
+#up{left:14px;bottom:100px}
+#down{left:14px;bottom:25px}
+#gas{right:14px;bottom:25px;width:clamp(80px,14vw,115px);height:clamp(65px,12vh,85px);color:#6bffab;border-color:#24ff91;font-size:15px}
+#brake{right:14px;bottom:115px;width:clamp(80px,14vw,115px);height:clamp(55px,10vh,70px);color:#ff7777;border-color:#ff4444;font-size:14px}
+#speedBox{position:absolute;left:12px;top:12px;padding:8px 12px;border:1px solid #00eaff;border-radius:8px;background:#08081ccc;color:#00f6ff;font-weight:bold;font-size:13px;line-height:1.4}
+#menuButton{position:absolute;top:12px;right:12px;pointer-events:auto;padding:8px 12px;font-size:12px}
+#crashScreen{background:rgba(20,0,12,.91)}
+#crashScreen h1{color:#ff3f5f;text-shadow:0 0 15px red}
+.game-over-buttons{display:flex;gap:10px;flex-wrap:wrap;justify-content:center;margin-top:14px}
+.reward-box{background:#0d0d28;border:2px solid #ffd700;border-radius:10px;padding:10px 16px;margin-top:12px;font-size:14px;line-height:1.7}
+.reward-box .coins{color:#ffd700;font-weight:bold;font-size:18px}
+.reward-box .exp{color:#00f6ff;font-weight:bold}
+#levelUpNotif{position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);z-index:20;background:linear-gradient(135deg,#0a0a2a,#1a1a4a);border:3px solid #ffd700;border-radius:14px;padding:18px 28px;text-align:center;box-shadow:0 0 40px #ffd70088;animation:popIn .4s ease-out;pointer-events:none}
+@keyframes popIn{from{transform:translate(-50%,-50%) scale(.6);opacity:0}to{transform:translate(-50%,-50%) scale(1);opacity:1}}
+#levelUpNotif h2{color:#ffd700;margin:0 0 8px;font-size:22px}
+#levelUpNotif p{margin:6px 0;color:#fff;font-size:14px}
+#levelUpNotif .card-reward{color:#ff6bff;font-weight:bold;font-size:16px}
+#shopScreen{position:fixed;inset:0;z-index:15;background:rgba(4,4,20,.98);display:flex;flex-direction:column;overflow-y:auto}
+.shop-header{display:flex;justify-content:space-between;align-items:center;padding:10px 16px;border-bottom:2px solid #34345c;background:#0a0a22;flex-wrap:wrap;gap:8px}
+.shop-header h2{margin:0;font-size:20px}
+.shop-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:10px;padding:14px;width:100%;max-width:1000px;margin:0 auto}
+.shop-card{border:2px solid #34345c;background:#101029;border-radius:10px;padding:8px;cursor:pointer;text-align:center}
+.shop-card:hover{border-color:#00f6ff}
+.shop-card.owned{border-color:#6bffab}
+.shop-card canvas{display:block;width:100%;height:64px}
+#carDetail{position:fixed;inset:0;z-index:25;background:rgba(2,2,15,.98);display:flex;flex-direction:column;justify-content:flex-start;align-items:center;padding:14px;overflow-y:auto}
+#detailCanvas{background:#0a0a20;border-radius:14px;border:2px solid #00eaff;box-shadow:0 0 30px #00d9ff44;max-width:90vw;max-height:30vh}
+.detail-name{font-size:clamp(20px,5vw,32px);font-weight:bold;color:#00f6ff;margin:10px 0 2px;text-shadow:0 0 12px #00d9ff}
+.detail-desc{color:#b8b8d7;font-size:13px;margin-bottom:8px}
+.detail-stats{display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:8px;width:min(640px,100%);margin-bottom:8px}
+.detail-stat{background:#0d0d28;border:2px solid #34345c;border-radius:10px;padding:6px;text-align:center}
+.detail-stat .label{color:#b8b8d7;font-size:10px;text-transform:uppercase;letter-spacing:1px}
+.detail-stat .val{color:#ffd700;font-size:18px;font-weight:bold;margin-top:2px}
+.detail-stat .val.speed{color:#ff6b6b}.detail-stat .val.handling{color:#6bffab}.detail-stat .val.accel{color:#00f6ff}
+.bar{height:6px;background:#22224a;border-radius:3px;margin-top:6px;overflow:hidden}
+.bar-fill{height:100%;border-radius:3px}
+.detail-price{font-size:20px;font-weight:bold;color:#ffd700;margin:4px 0 8px}
+.detail-price.owned{color:#6bffab}
+.detail-buttons{display:flex;gap:10px;flex-wrap:wrap;justify-content:center}
+input,select,textarea{-webkit-user-select:text;user-select:text;touch-action:auto}
+input,select,textarea{background:#101a38;color:#fff;border:2px solid #34345c;border-radius:8px;padding:9px 12px;font-size:14px;margin:4px;width:min(260px,90%)}
+input[type=color]{padding:0;height:36px;width:60px}input[type=range]{padding:0;width:min(220px,60%)}
+.verified{display:inline-block;background:#1d9bf0;color:#fff;border-radius:50%;width:18px;height:18px;line-height:18px;font-size:12px;text-align:center;margin-left:4px;box-shadow:0 0 8px #1d9bf0}
+#accBar{display:flex;gap:10px;align-items:center;justify-content:center;margin-bottom:8px;font-size:13px;color:#b8b8d7}
+#accBar button{padding:4px 10px;font-size:11px}
+.b-vip{display:inline-block;background:linear-gradient(135deg,#fff3a0,#ffd700,#b8860b);color:#3a2a00;font-weight:bold;font-size:10px;padding:2px 7px;border-radius:9px;margin-left:5px;box-shadow:0 0 10px #ffd70099;letter-spacing:1px}
+.b-ex{display:inline-block;background:#3a3a4a;color:#9a9ab0;font-weight:bold;font-size:10px;padding:2px 7px;border-radius:9px;margin-left:5px;border:1px dashed #6a6a80}
+.b-cr{display:inline-block;background:linear-gradient(135deg,#ff00aa,#7a2aff);color:#fff;font-weight:bold;font-size:10px;padding:2px 7px;border-radius:9px;margin-left:5px;box-shadow:0 0 10px #ff00aa99;letter-spacing:1px}
+#wheelie{right:clamp(100px,17vw,140px);bottom:115px;width:clamp(70px,11vw,95px);height:clamp(52px,10vh,70px);font-size:13px;color:#ffd700;border-color:#ffd700}
+#nitro{right:clamp(100px,17vw,140px);bottom:25px;width:clamp(70px,11vw,95px);height:clamp(60px,11vh,80px);font-size:13px;color:#00eaff;border-color:#00eaff}
+#pauseBtn{position:absolute;top:12px;right:80px;pointer-events:auto;padding:8px 12px;font-size:12px}
+.cr-row{display:flex;align-items:center;justify-content:center;gap:8px;flex-wrap:wrap;font-size:13px;color:#b8b8d7;margin:2px 0}
+.screen>:first-child,#carDetail>:first-child{margin-top:auto}
+.screen>:last-child,#carDetail>:last-child{margin-bottom:auto}
+@media(max-height:480px){.screen{padding:8px}h1{font-size:20px;margin:0 0 2px}h2{margin:4px 0;font-size:14px}.subtitle{margin:0 0 4px;font-size:11px}.stats-bar{padding:3px 10px;margin-bottom:4px;font-size:12px}#cars{grid-template-columns:repeat(auto-fill,minmax(90px,1fr));gap:5px;margin-bottom:6px}.car-card canvas{height:44px}button{padding:8px 12px;font-size:12px}#startButton{padding:10px 22px;font-size:15px}#shopButton{padding:8px 14px;font-size:13px}input,select{padding:6px 10px;margin:2px}.reward-box{padding:6px 10px;margin-top:6px;font-size:12px;line-height:1.4}#carDetail{padding:8px}#detailCanvas{max-height:26vh}.detail-stats{margin-bottom:4px}.shop-grid{padding:8px}#speedBox{font-size:11px;padding:5px 8px}#menuButton,#pauseBtn{padding:6px 9px}#pauseBtn{right:70px}#muteBtn{top:4px}}
+#portraitWarning{display:none;position:fixed;inset:0;z-index:50;background:#080819;align-items:center;justify-content:center;text-align:center;padding:25px;font-size:20px}
+@media(orientation:portrait) and (pointer:coarse){#portraitWarning{display:flex}}
+#kbHint{display:none;position:absolute;left:50%;bottom:6px;transform:translateX(-50%);background:#08081ccc;border:1px solid #34345c;border-radius:8px;padding:4px 10px;font-size:11px;color:#b8b8d7;white-space:nowrap}
+@media(hover:hover) and (pointer:fine){#kbHint{display:block}}
+</style>
+</head>
+<body>
+<canvas id="game" width="640" height="360"></canvas>
+<button id="muteBtn">🔊</button>
+
+<div id="menu" class="screen">
+  <h1>PIXEL NIGHT DRIVE</h1>
+  <p class="subtitle">NEON CITY • NIGHT RACING • TURBO EDITION</p>
+  <div id="accBar">👤 <b id="accName" style="color:#fff"></b><span id="accBadge" class="verified hidden">✔</span><span id="accBadges"></span><button id="logoutBtn" style="border-color:#ff7777;color:#ff7777">🚪 ВЫЙТИ ИЗ АККАУНТА</button></div>
+  <div class="stats-bar">
+    <div class="stat"><span class="icon">🪙</span><span class="value" id="menuCoins">0</span></div>
+    <div class="stat"><span class="icon">⭐</span><span class="value level" id="menuLevel">1</span></div>
+    <div class="stat"><span class="icon">📊</span><span class="value" style="color:#b8b8d7" id="menuExp">0/50</span></div>
+    <div class="stat"><span class="icon">🃏</span><span class="value" style="color:#ff6bff" id="menuCards">0</span></div>
+    <div class="stat"><span class="icon">🏁</span><span class="value" style="color:#6bffab" id="menuBest">0</span></div>
+  </div>
+  <h2>ТРАССА</h2>
+  <div id="tracks"></div>
+  <h2>ТВОЙ ГАРАЖ</h2>
+  <div id="cars"></div>
+  <div style="display:flex;gap:10px;flex-wrap:wrap;justify-content:center;margin-top:4px">
+    <button id="lbButton">🏆 РЕЙТИНГ</button>
+    <button id="passButton" style="border-color:#6bffab;color:#6bffab">🎟️ ПРОПУСК</button>
+    <button id="vipButton" style="border-color:#ffd700;color:#ffd700">👑 M.V.I.P</button>
+    <button id="friendsButton">👥 ДРУЗЬЯ</button>
+    <button id="lockerButton">🗄️ ШКАФЧИК</button>
+    <button id="shopButton">🏪 МАГАЗИН</button>
+    <button id="creatorButton" class="hidden" style="border-color:#ff6bff;color:#ff6bff">🛠️ СОЗДАТЬ МАШИНУ</button>
+    <button id="startButton">ИГРАТЬ</button>
+  </div>
+  <p class="subtitle" style="margin-top:10px" id="carInfo"></p>
+  <p class="subtitle" style="font-size:11px">Клавиатура: ↑↓ / W S — полоса • → / D / Пробел — газ • ← / A / Shift — тормоз • N — нитро • Q / E — стант (мото)</p>
+</div>
+
+<div id="shopScreen" class="hidden">
+  <div class="shop-header">
+    <h2>🏪 МАГАЗИН МАШИН</h2>
+    <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap">
+      <div style="color:#ffd700;font-weight:bold;font-size:16px">🪙 <span id="shopCoins">0</span></div>
+      <button id="shopCloseButton">← НАЗАД</button>
+    </div>
+  </div>
+  <div class="shop-grid" id="shopGrid"></div>
+</div>
+
+<div id="carDetail" class="hidden">
+  <canvas id="detailCanvas" width="500" height="180"></canvas>
+  <div class="detail-name" id="detailName">CAR</div>
+  <div class="detail-desc" id="detailDesc"></div>
+  <div class="detail-stats">
+    <div class="detail-stat"><div class="label">Скорость</div><div class="val speed" id="statSpeed">0</div><div class="bar"><div class="bar-fill" id="barSpeed" style="background:#ff6b6b;width:0%"></div></div></div>
+    <div class="detail-stat"><div class="label">Управление</div><div class="val handling" id="statHandling">0</div><div class="bar"><div class="bar-fill" id="barHandling" style="background:#6bffab;width:0%"></div></div></div>
+    <div class="detail-stat"><div class="label">Разгон</div><div class="val accel" id="statAccel">0</div><div class="bar"><div class="bar-fill" id="barAccel" style="background:#00f6ff;width:0%"></div></div></div>
+    <div class="detail-stat"><div class="label">Редкость</div><div class="val" id="statRarity" style="color:#ff6bff">★</div></div>
+  </div>
+  <div class="detail-price" id="detailPrice">🪙 0</div>
+  <div class="detail-buttons">
+    <button id="detailBuyButton">КУПИТЬ</button>
+    <button id="detailCloseButton">ЗАКРЫТЬ</button>
+  </div>
+</div>
+
+<div id="controls" class="hidden">
+  <div id="speedBox">СКОРОСТЬ: <span id="speedValue">0</span><br>🪙 <span id="runCoins">0</span> | ⭐ УР. <span id="runLevel">1</span><br>⏱️ <span id="runTime">0.0</span>с<br>⚡ <span id="nitroVal">100</span>%</div>
+  <div id="kbHint">↑↓ полоса • → / Пробел газ • ← / Shift тормоз • N нитро • Q/E стант • P пауза • F полный экран</div>
+  <button id="menuButton">МЕНЮ</button>
+  <button id="pauseBtn">⏸ ПАУЗА</button>
+  <button id="up" class="control">⬆️</button>
+  <button id="down" class="control">⬇️</button>
+  <button id="brake" class="control">ТОРМОЗ</button>
+  <button id="gas" class="control">ГАЗ</button>
+  <button id="wheelie" class="control hidden">СТАНТ 🏍️</button>
+  <button id="nitro" class="control">НИТРО ⚡</button>
+</div>
+
+<div id="crashScreen" class="screen hidden">
+  <h1>💥 АВАРИЯ!</h1>
+  <div class="reward-box">
+    <div>Время в заезде: <span class="exp" id="crashTime">0.0</span>с • Дистанция: <span class="exp" id="crashDist">0</span> м</div>
+    <div>Заработано монет: <span class="coins" id="crashCoins">+0</span> 🪙</div>
+    <div>Опыт: <span class="exp" id="crashExp">+0</span> ⭐</div>
+    <div id="crashRecord" style="color:#6bffab;font-weight:bold"></div>
+  </div>
+  <div class="game-over-buttons">
+    <button id="restartButton">ИГРАТЬ СНОВА</button>
+    <button id="crashMenuButton">В МЕНЮ</button>
+    <button id="crashLogoutBtn" style="border-color:#ff7777;color:#ff7777">🚪 ВЫЙТИ ИЗ АККАУНТА</button>
+  </div>
+</div>
+
+<div id="lbScreen" class="screen hidden" style="z-index:20">
+  <h2>🏆 ОБЩИЙ РЕЙТИНГ (рекорд дистанции)</h2>
+  <div id="lbList" style="width:min(600px,100%)"></div>
+  <button id="lbClose" style="margin-top:10px">← НАЗАД</button>
+</div>
+
+<div id="passScreen" class="screen hidden" style="z-index:20">
+  <h2>🎟️ СЕЗОННЫЙ ПРОПУСК</h2>
+  <div id="passInfo" class="reward-box" style="width:min(700px,100%);margin-top:0"></div>
+  <button id="passGoldBtn" style="margin:8px;border-color:#ffd700;color:#ffd700">🥇 ЗОЛОТОЙ ПРОПУСК</button>
+  <p id="passMsg" style="color:#ff7777;font-size:13px;min-height:16px"></p>
+  <div id="passList" style="width:min(700px,100%)"></div>
+  <button id="passClose">← НАЗАД</button>
+</div>
+
+<div id="vipScreen" class="screen hidden" style="z-index:20">
+  <h1 style="color:#ffd700;text-shadow:0 0 14px #ffaa00">👑 M.V.I.P — МОТО ВИП</h1>
+  <p class="subtitle">Все мотоциклы бесплатно, пока подписка активна • золотой бейдж • трюк «СТАНТ» (езда на заднем колесе)</p>
+  <div id="vipStatus" class="reward-box"></div>
+  <div id="vipPlans" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:10px;width:min(700px,100%);margin:12px 0"></div>
+  <p class="subtitle" style="font-size:11px">Оплати по ссылке — владелец игры пришлёт код активации.</p>
+  <div class="cr-row"><input id="vipCode" placeholder="Код MVIP-..." maxlength="26"><button id="vipRedeem">АКТИВИРОВАТЬ</button></div>
+  <p id="vipMsg" style="color:#6bffab;font-size:13px;min-height:18px"></p>
+  <button id="vipClose">← НАЗАД</button>
+</div>
+
+<div id="friendsScreen" class="screen hidden" style="z-index:20;justify-content:flex-start">
+  <h2>👥 ДРУЗЬЯ И ПАРНЫЕ ЗАБЕГИ</h2>
+  <div class="cr-row"><input id="fName" placeholder="Логин друга" maxlength="16"><button id="fAdd">ДОБАВИТЬ</button></div>
+  <p id="fMsg" style="color:#6bffab;font-size:13px;min-height:18px"></p>
+  <div id="fList" style="width:min(700px,100%)"></div>
+  <button id="fClose" style="margin-top:10px">← НАЗАД</button>
+</div>
+
+<div id="lockerScreen" class="screen hidden" style="z-index:20;justify-content:flex-start">
+  <h2>🗄️ ШКАФЧИК</h2>
+  <div id="lkPreview" class="reward-box" style="margin-top:0"></div>
+  <div class="cr-row" id="lkTabs" style="margin:8px 0"><button data-t="badges">🏅 БЕЙДЖИ</button><button data-t="suits">🧥 КОСТЮМЫ</button><button data-t="avatars">🙂 АВАТАРКИ</button></div>
+  <div id="lkGrid" class="shop-grid"></div>
+  <button id="lkClose">← НАЗАД</button>
+</div>
+
+<div id="authScreen" class="screen" style="z-index:60;background:#050511">
+  <h1>PIXEL NIGHT DRIVE</h1>
+  <p class="subtitle">Вход в аккаунт</p>
+  <input id="authUser" placeholder="Логин" maxlength="16" autocomplete="username">
+  <input id="authPass" type="password" placeholder="Пароль" autocomplete="current-password">
+  <div class="game-over-buttons"><button id="loginBtn">ВОЙТИ</button><button id="regBtn">РЕГИСТРАЦИЯ</button></div>
+  <button id="guestBtn" style="margin-top:12px;border-color:#34345c">ИГРАТЬ ГОСТЕМ</button>
+  <p id="authMsg" style="color:#ff7777;font-size:13px;min-height:18px"></p>
+  <p class="subtitle" style="font-size:11px">Аккаунты хранятся на этом устройстве, пароли — в виде хэша.</p>
+</div>
+
+<div id="crScreen" class="screen hidden" style="z-index:20">
+  <h1 style="color:#ff6bff;text-shadow:0 0 12px #ff6bff">🛠️ СОЗДАНИЕ МАШИНЫ</h1>
+  <canvas id="crCanvas" width="300" height="140" style="border:2px solid #ff6bff;border-radius:12px;max-width:80vw"></canvas>
+  <div class="cr-row"><input id="cName" placeholder="Название" maxlength="12"><select id="cShape"><option value="0">Вид: Спорт</option><option value="1">Вид: Купе (низкое)</option><option value="2">Вид: Внедорожник</option><option value="3">Вид: Со спойлером</option></select></div>
+  <div class="cr-row">Кузов <input id="cBody" type="color" value="#ff00aa"> Крыша <input id="cRoof" type="color" value="#ff66cc"> Неон <input id="cGlow" type="color" value="#00eaff"></div>
+  <div class="cr-row">Скорость <b id="vSpeed">8</b> <input id="cSpeed" type="range" min="1" max="15" value="8"></div>
+  <div class="cr-row">Управление <b id="vHandling">8</b> <input id="cHandling" type="range" min="1" max="15" value="8"></div>
+  <div class="cr-row">Разгон <b id="vAccel">8</b> <input id="cAccel" type="range" min="1" max="15" value="8"></div>
+  <div class="cr-row"><input id="cPrice
